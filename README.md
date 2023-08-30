@@ -1,1 +1,1 @@
-# Fair_Finetuning
+## Aligning Large Language Model with Fair Preference
