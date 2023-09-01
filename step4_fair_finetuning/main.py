@@ -32,7 +32,7 @@ from transformers import (
 
 import deepspeed
 
-from ppo_trainer import DeepSpeedPPOTrainer, DeepSpeedPPOTrainerUnsupervised
+from fair_trainer import FairTrainer, DeepSpeedPPOTrainerUnsupervised
 from rlhf_engine import DeepSpeedRLHFEngine
 
 import sys
