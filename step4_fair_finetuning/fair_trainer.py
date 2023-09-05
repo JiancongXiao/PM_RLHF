@@ -160,13 +160,20 @@ class FairTrainer():
 
         return rewards
 
-    def compute_preference_probability(self, reward_score_1. reward_score_2):
+    def compute_reward_preference_prob(self, reward_score_1. reward_score_2):
 
-        preference_probability = torch.sigmoid(reward_score_1 - reward_score_2)
+        reward_preference_prob = torch.sigmoid(reward_score_1 - reward_score_2)
 
-        return preference_probability
+        return reward_preference_prob
 
-    def 
+    def compute_output_preference_prob(self, prompts, log_probs_1, log_probs_2):
+
+        probs_1 = torch.exp(torch.sum(log_probs_1, dim = 1))
+        probs_2 = torch.exp(torch.sum(log_probs_2, dim = 1))
+
+        output_preference_prob = torch.div(probs_1, probs_1+probs_2)
+        
+        return output_preference_prob
 
 
     def train_rlhf(self, inputs):
