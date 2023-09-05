@@ -174,8 +174,13 @@ class FairTrainer():
         output_preference_prob = torch.div(probs_1, probs_1+probs_2)
         
         return output_preference_prob
+        
+    def fair_loss(self, reward_preference_prob, output_preference_prob):
 
+        loss = torch.mul(reward_preference_prob, torch.sigmoid(output_preference_prob)
 
+        return loss
+        
     def train_rlhf(self, inputs):
         # train the rlhf mode here
         ### process the old outputs
