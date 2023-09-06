@@ -160,7 +160,7 @@ class FairTrainer():
 
         return rewards
 
-    def compute_reward_preference_prob(self, reward_score_1. reward_score_2):
+    def compute_reward_preference_prob(self, reward_score_1, reward_score_2):
 
         reward_preference_prob = torch.sigmoid(reward_score_1 - reward_score_2)
 
@@ -200,6 +200,9 @@ class FairTrainer():
         
         reward_score_1 = inputs_1['rewards']
         reward_score_2 = inputs_2['rewards']
+
+        reward_preference_prob = self.compute_reward_preference_prob(self, reward_score_1, reward_score_2)
+        
         attention_mask_1 = inputs_1['attention_mask']
         attention_mask_1 = inputs_2['attention_mask']
         
@@ -226,55 +229,21 @@ class FairTrainer():
         #         old_values, old_rewards, start)
 
         ### process the new outputs
-        batch = {'input_ids': seq, "attention_mask": attention_mask}
-        actor_prob = self.actor_model(**batch, use_cache=False).logits
-        actor_log_prob = gather_log_probs(actor_prob[:, :-1, :], seq[:, 1:])
-        fair_loss = self.actor_loss_fn(actor_log_prob[:, start:],
-                                        log_probs[:, start:], advantages,
-                                        action_mask[:, start:])
-        reward_preference_prob = self.
-        output_preference_prob = self.compute_output_preference_prob(self, prompts, log_probs_1, log_probs_2, action_mask_1, action_mask_2)
+        batch_1 = {'input_ids': seq_1, "attention_mask": attention_mask_1}
+        batch_2 = {'input_ids': seq_2, "attention_mask": attention_mask_2}
+        
+        actor_prob_1 = self.actor_model(**batch_1, use_cache=False).logits
+        actor_prob_1 = self.actor_model(**batch_2, use_cache=False).logits
+        
+        actor_log_probs_1 = gather_log_probs(actor_prob_1[:, :-1, :], seq_2[:, 1:])
+        actor_log_probs_2 = gather_log_probs(actor_prob_2[:, :-1, :], seq_2[:, 1:])
+
+        output_preference_prob = self.compute_output_preference_prob(self, prompts, actor_log_probs_1, actor_log_probs_2, action_mask_1, action_mask_2)
         
         fair_loss = self.fair_loss_fn(self, reward_preference_prob, output_preference_prob)
         
         self.actor_model.backward(fair_loss)
         self.actor_model.step()
-        
-        # if not self.args.align_overflow:xx
-            
-
-        # value = self.critic_model.forward_value(**batch,
-        #                                         return_value_only=True,
-        #                                         use_cache=False)[:, :-1]
-        # critic_loss = self.critic_loss_fn(value[:, start:], old_values[:,
-        #                                                                start:],
-        #                                   returns, action_mask[:, start:])
-        # self.critic_model.backward(critic_loss)
-
-        # if self.args.align_overflow:
-        #     actor_overflow = self.actor_model.optimizer.check_overflow(
-        #         external=True)
-        #     critic_overflow = self.critic_model.optimizer.check_overflow(
-        #         external=True)
-
-        #     rank = torch.distributed.get_rank()
-        #     if actor_overflow and not critic_overflow:
-        #         self.critic_model.optimizer.skip_step = True
-        #         print_rank_0(
-        #             "OVERFLOW: actor overflow, skipping both actor and critic steps",
-        #             rank)
-        #     elif not actor_overflow and critic_overflow:
-        #         self.actor_model.optimizer.skip_step = True
-        #         print_rank_0(
-        #             "OVERFLOW: critic overflow, skipping both actor and critic steps",
-        #             rank)
-        #     elif actor_overflow and critic_overflow:
-        #         print_rank_0(
-        #             "OVERFLOW: actor and critic overflow, skipping both actor and critic steps",
-        #             rank)
-        #     self.actor_model.step()
-
-        # self.critic_model.step()
 
         return fair_loss
         
