@@ -449,7 +449,7 @@ def main():
 
     args.end_of_conversation_token = "<|endoftext|>"
 
-    fair_trainer = DeepSpeedFairTrainerUnsupervised if unsupervised_training_enabled else DeepSpeedFairTrainer
+    fair_trainer = DeepSpeedFairTrainerUnsupervised if unsupervised_training_enabled else FairTrainer
     trainer = fair_trainer(rlhf_engine, args)
 
     # first number is how many experience-batch to generate, second number is the training batch size, which is the micro-batch size used
