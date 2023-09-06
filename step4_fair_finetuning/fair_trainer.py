@@ -413,7 +413,7 @@ class FairTrainer():
                         self.args.local_rank)
 
 
-class DeepSpeedPPOTrainerUnsupervised(FairTrainer):
+class DeepSpeedFairTrainerUnsupervised(FairTrainer):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
