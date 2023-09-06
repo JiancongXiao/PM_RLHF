@@ -166,10 +166,15 @@ class FairTrainer():
 
         return reward_preference_prob
 
-    def compute_output_preference_prob(self, prompts, log_probs_1, log_probs_2):
+    def compute_output_preference_prob(self, prompts, log_probs_1, log_probs_2, action_mask):
 
-        probs_1 = torch.exp(torch.sum(log_probs_1, dim = 1))
-        probs_2 = torch.exp(torch.sum(log_probs_2, dim = 1))
+        start = prompts.shape[1] - 1
+        ends = start + action_mask[:, start:].sum(1) + 1
+        batch_size = log_probs.shape[0]
+        
+        for j in range(batch_size):
+            probs_1[j] = torch.exp(torch.sum(log_probs_1[j, start:ends[j]]))
+            probs_2[j] = torch.exp(torch.sum(log_probs_1[j, start:ends[j]]))
 
         output_preference_prob = torch.div(probs_1, probs_1+probs_2)
         
@@ -178,8 +183,88 @@ class FairTrainer():
     def fair_loss(self, reward_preference_prob, output_preference_prob):
 
         loss = torch.mul(reward_preference_prob, torch.sigmoid(output_preference_prob)
-
+        batch_size = reward_preference_prob.shape[0]
+        loss = torch.sum(loss)/batch_size
+        
         return loss
+        
+    def train_fair(self, inputs):
+        # train the fair mode here
+        
+        prompts = inputs['prompts']
+        
+        log_probs_1 = inputs['logprobs_1']
+        log_probs_2 = inputs['logprobs_2']
+        
+        reward_score = inputs['rewards']
+        attention_mask = inputs['attention_mask']
+        
+        seq_1 = inputs['input_ids_1']
+        seq_2 = inputs['input_ids_2']
+        
+        start = prompts.size()[-1] - 1
+        action_mask = attention_mask[:, 1:]
+
+        old_values = values
+        with torch.no_grad():
+            old_rewards = self.compute_rewards(prompts, log_probs,
+                                               ref_log_probs, reward_score,
+                                               action_mask)
+            ends = start + action_mask[:, start:].sum(1) + 1
+            # we need to zero out the reward and value after the end of the conversation
+            # otherwise the advantage/return will be wrong
+            for i in range(old_rewards.shape[0]):
+                old_rewards[i, ends[i]:] = 0
+                old_values[i, ends[i]:] = 0
+            advantages, returns = self.get_advantages_and_returns(
+                old_values, old_rewards, start)
+
+        ### process the new outputs
+        batch = {'input_ids': seq, "attention_mask": attention_mask}
+        actor_prob = self.actor_model(**batch, use_cache=False).logits
+        actor_log_prob = gather_log_probs(actor_prob[:, :-1, :], seq[:, 1:])
+        actor_loss = self.actor_loss_fn(actor_log_prob[:, start:],
+                                        log_probs[:, start:], advantages,
+                                        action_mask[:, start:])
+        self.actor_model.backward(actor_loss)
+
+        if not self.args.align_overflow:
+            self.actor_model.step()
+
+        value = self.critic_model.forward_value(**batch,
+                                                return_value_only=True,
+                                                use_cache=False)[:, :-1]
+        critic_loss = self.critic_loss_fn(value[:, start:], old_values[:,
+                                                                       start:],
+                                          returns, action_mask[:, start:])
+        self.critic_model.backward(critic_loss)
+
+        if self.args.align_overflow:
+            actor_overflow = self.actor_model.optimizer.check_overflow(
+                external=True)
+            critic_overflow = self.critic_model.optimizer.check_overflow(
+                external=True)
+
+            rank = torch.distributed.get_rank()
+            if actor_overflow and not critic_overflow:
+                self.critic_model.optimizer.skip_step = True
+                print_rank_0(
+                    "OVERFLOW: actor overflow, skipping both actor and critic steps",
+                    rank)
+            elif not actor_overflow and critic_overflow:
+                self.actor_model.optimizer.skip_step = True
+                print_rank_0(
+                    "OVERFLOW: critic overflow, skipping both actor and critic steps",
+                    rank)
+            elif actor_overflow and critic_overflow:
+                print_rank_0(
+                    "OVERFLOW: actor and critic overflow, skipping both actor and critic steps",
+                    rank)
+            self.actor_model.step()
+
+        self.critic_model.step()
+
+        return actor_loss, critic_loss
         
     def train_rlhf(self, inputs):
         # train the rlhf mode here
