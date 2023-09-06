@@ -185,7 +185,7 @@ def parse_args():
         help="Number of steps for the warmup in the lr scheduler.")
     parser.add_argument("--output_dir",
                         type=str,
-                        default=None,
+                        default="../fair_output",
                         help="Where to store the model.")
     parser.add_argument("--seed",
                         type=int,
@@ -500,19 +500,17 @@ def main():
 
             if exp_dataset is not None:
                 inner_iter = 0
-                actor_loss_sum, critic_loss_sum, unsup_loss_sum = 0, 0, 0
-                average_reward = 0
+                fair_loss_sum, unsup_loss_sum = 0, 0, 0
+
 
                 if args.actor_gradient_checkpointing:
                     rlhf_engine.actor.gradient_checkpointing_enable()
 
                 for ppo_ep in range(args.ppo_epochs):
-                    for i, (exp_data, unsup_data) in enumerate(
-                            zip(exp_dataset, unsup_dataset)):
-                        actor_loss, critic_loss = trainer.train_rlhf(exp_data)
-                        actor_loss_sum += actor_loss.item()
-                        critic_loss_sum += critic_loss.item()
-                        average_reward += exp_data["rewards"].mean()
+                    for i, (exp_data_1, exp_data_2, unsup_data) in enumerate(
+                            zip(exp_dataset_1, exp_dataset_2, unsup_dataset)):
+                        fair_loss = trainer.train_fair(exp_data_1, exp_data_2)
+                        fair_loss_sum += fair_loss.item()
 
                         if unsupervised_training_enabled:
                             unsup_loss = trainer.train_unsupervised(
@@ -525,36 +523,36 @@ def main():
                                            rlhf_engine.actor_ema,
                                            zero_stage=args.actor_zero_stage)
 
-                    random.shuffle(exp_dataset)
-                    random.shuffle(unsup_dataset)
+                    # random.shuffle(exp_dataset)
+                    # random.shuffle(unsup_dataset)
 
                 print_rank_0(
-                    f'epoch: {epoch}|step: {step}|ppo_ep: {ppo_ep+1}|act_loss: {actor_loss_sum/inner_iter}|cri_loss: {critic_loss_sum/inner_iter}|unsuper_loss: {unsup_loss_sum/inner_iter}',
+                    f'epoch: {epoch}|step: {step}|fair_ep: {ppo_ep+1}|fair_loss: {fair_loss_sum/inner_iter}|unsuper_loss: {unsup_loss_sum/inner_iter}',
                     args.global_rank)
                 average_reward = get_all_reduce_mean(average_reward).item()
-                print_rank_0(
-                    f"average reward score: {average_reward/inner_iter}",
-                    args.global_rank)
+                # print_rank_0(
+                #     f"average reward score: {average_reward/inner_iter}",
+                #     args.global_rank)
                 print_rank_0(
                     "-------------------------------------------------------------------------------------",
                     args.global_rank)
                 if args.enable_tensorboard and torch.distributed.get_rank(
                 ) == 0:
-                    writer.add_scalar('reward',
-                                      average_reward / inner_iter,
+                    # writer.add_scalar('reward',
+                    #                   average_reward / inner_iter,
+                    #                   global_step=step)
+                    writer.add_scalar('fair_loss',
+                                      fair_loss,
                                       global_step=step)
-                    writer.add_scalar('actor_loss',
-                                      actor_loss,
+                    writer.add_scalar('fair_loss_sum',
+                                      fair_loss_sum,
                                       global_step=step)
-                    writer.add_scalar('actor_loss_sum',
-                                      actor_loss_sum,
-                                      global_step=step)
-                    writer.add_scalar('critic_loss',
-                                      critic_loss,
-                                      global_step=step)
-                    writer.add_scalar('critic_loss_sum',
-                                      critic_loss_sum,
-                                      global_step=step)
+                    # writer.add_scalar('critic_loss',
+                    #                   critic_loss,
+                    #                   global_step=step)
+                    # writer.add_scalar('critic_loss_sum',
+                    #                   critic_loss_sum,
+                    #                   global_step=step)
                     writer.flush()
 
             if args.actor_gradient_checkpointing:
