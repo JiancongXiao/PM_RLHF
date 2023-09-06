@@ -1,7 +1,5 @@
 # 🐕 Reinforcement Learning from human feedback (RLHF) finetuning
 
-<img src="../../assets/image/ppo_trainer.png" width="900"/>
-
 There are two main challenges here:
 
 * 😵 How to handle the large memory consumption used for multiple models?
