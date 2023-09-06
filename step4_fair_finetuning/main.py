@@ -32,7 +32,7 @@ from transformers import (
 
 import deepspeed
 
-from fair_trainer import FairTrainer, DeepSpeedPPOTrainerUnsupervised
+from fair_trainer import FairTrainer, DeepSpeedFairTrainerUnsupervised
 from rlhf_engine import DeepSpeedRLHFEngine
 
 import sys
@@ -449,8 +449,8 @@ def main():
 
     args.end_of_conversation_token = "<|endoftext|>"
 
-    ppo_trainer = DeepSpeedPPOTrainerUnsupervised if unsupervised_training_enabled else DeepSpeedPPOTrainer
-    trainer = ppo_trainer(rlhf_engine, args)
+    fair_trainer = DeepSpeedFairTrainerUnsupervised if unsupervised_training_enabled else DeepSpeedFairTrainer
+    trainer = fair_trainer(rlhf_engine, args)
 
     # first number is how many experience-batch to generate, second number is the training batch size, which is the micro-batch size used
   
