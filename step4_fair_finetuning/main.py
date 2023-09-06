@@ -185,7 +185,7 @@ def parse_args():
         help="Number of steps for the warmup in the lr scheduler.")
     parser.add_argument("--output_dir",
                         type=str,
-                        default="../fair_output",
+                        default=None,
                         help="Where to store the model.")
     parser.add_argument("--seed",
                         type=int,
@@ -500,7 +500,7 @@ def main():
 
             if exp_dataset is not None:
                 inner_iter = 0
-                fair_loss_sum, unsup_loss_sum = 0, 0, 0
+                fair_loss_sum, unsup_loss_sum = 0, 0
 
 
                 if args.actor_gradient_checkpointing:
@@ -529,7 +529,7 @@ def main():
                 print_rank_0(
                     f'epoch: {epoch}|step: {step}|fair_ep: {ppo_ep+1}|fair_loss: {fair_loss_sum/inner_iter}|unsuper_loss: {unsup_loss_sum/inner_iter}',
                     args.global_rank)
-                average_reward = get_all_reduce_mean(average_reward).item()
+                # average_reward = get_all_reduce_mean(average_reward).item()
                 # print_rank_0(
                 #     f"average reward score: {average_reward/inner_iter}",
                 #     args.global_rank)
