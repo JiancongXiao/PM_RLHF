@@ -453,8 +453,12 @@ def main():
     trainer = ppo_trainer(rlhf_engine, args)
 
     # first number is how many experience-batch to generate, second number is the training batch size, which is the micro-batch size used
-    exp_mini_dataset = MiniDataset(args.generation_batch_numbers,
+  
+    exp_mini_dataset_1 = MiniDataset(args.generation_batch_numbers,
                                    args.per_device_mini_train_batch_size)
+    exp_mini_dataset_2 = MiniDataset(args.generation_batch_numbers,
+                                   args.per_device_mini_train_batch_size)
+
     unsup_mini_dataset = MiniDataset(args.generation_batch_numbers,
                                      args.per_device_mini_train_batch_size)
 
