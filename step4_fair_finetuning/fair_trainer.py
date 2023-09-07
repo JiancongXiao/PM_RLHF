@@ -185,8 +185,7 @@ class FairTrainer():
     def fair_loss_fn(self, reward_preference_prob, output_preference_prob):
 
         loss = torch.mul(reward_preference_prob, torch.sigmoid(output_preference_prob)
-        batch_size = reward_preference_prob.shape[0]
-        loss = torch.sum(loss)/batch_size
+        loss = torch.mean(loss)
         
         return loss
         
@@ -204,10 +203,10 @@ class FairTrainer():
         reward_preference_prob = self.compute_reward_preference_prob(self, reward_score_1, reward_score_2)
         
         attention_mask_1 = inputs_1['attention_mask']
-        attention_mask_1 = inputs_2['attention_mask']
+        attention_mask_2 = inputs_2['attention_mask']
         
         seq_1 = inputs_1['input_ids']
-        seq_2 = inputs_1['input_ids']
+        seq_2 = inputs_2['input_ids']
         
         start = prompts.size()[-1] - 1
         
@@ -233,9 +232,9 @@ class FairTrainer():
         batch_2 = {'input_ids': seq_2, "attention_mask": attention_mask_2}
         
         actor_prob_1 = self.actor_model(**batch_1, use_cache=False).logits
-        actor_prob_1 = self.actor_model(**batch_2, use_cache=False).logits
+        actor_prob_2 = self.actor_model(**batch_2, use_cache=False).logits
         
-        actor_log_probs_1 = gather_log_probs(actor_prob_1[:, :-1, :], seq_2[:, 1:])
+        actor_log_probs_1 = gather_log_probs(actor_prob_1[:, :-1, :], seq_1[:, 1:])
         actor_log_probs_2 = gather_log_probs(actor_prob_2[:, :-1, :], seq_2[:, 1:])
 
         output_preference_prob = self.compute_output_preference_prob(self, prompts, actor_log_probs_1, actor_log_probs_2, action_mask_1, action_mask_2)
