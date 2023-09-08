@@ -199,8 +199,9 @@ class FairTrainer():
         
         reward_score_1 = inputs_1['rewards']
         reward_score_2 = inputs_2['rewards']
-
-        reward_preference_prob = self.compute_reward_preference_prob(self, reward_score_1, reward_score_2)
+        
+        with torch.no_grad():
+            reward_preference_prob = self.compute_reward_preference_prob(self, reward_score_1, reward_score_2)
         
         attention_mask_1 = inputs_1['attention_mask']
         attention_mask_2 = inputs_2['attention_mask']
