@@ -15,6 +15,10 @@ Accurately aligning large language models (LLMs) with human preferences is cruci
 
 2. PM RLHF precisely aligns with RM preferences. This is mathematically provable and experimentally corroborated.
 
+## Code
+
+Throughout the experimental process, each stage of RLHF follows the standardized configurations established in the [DeepSpeed-Chat framework](https://github.com/microsoft/DeepSpeed).
+
 ## Citation
 ```
 @article{xiao2024algorithmic,
