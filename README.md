@@ -27,45 +27,51 @@ Accurately aligning large language models (LLMs) with human preferences is cruci
 
 To reproduce the experiments reported in Figure 1 and Table 1 of the paper, run the following shell script:
 
-Step 1: SFT
+Step 1: SFT:
 
 ```bash
-training_scripts/sft/train_llama2_7b.sh
+bash training_scripts/sft/train_llama2_7b.sh
 ```
 
-Step 2: Reward Modeling
+Step 2: Reward Modeling:
 
 ```bash
 bash training_scripts/rm/train_llama2_7b.sh
 ```
 
-Step 3: (Standard) RLHF Finetuning
+Step 3: RLHF Finetuning:
 
 ```bash
 bash training_scripts/po/ppo/train_llama2_7b.sh
+```
+
+For standard RLHF, set the parameters 
+
+```bash
    --penalty "kl" \
    --kl_ctl 0.1 \
    --ent_ctl 0 \
    --alpha_ctl 0 \
 ```
 
-For the experiments of PM RLHF, replace the parameters in Step 3 as follows:
+in the file train_llama2_7b.sh.
+
+For the experiments of PM RLHF, set the parameters 
 
 ```bash
-bash training_scripts/po/ppo/train_llama2_7b.sh
    --penalty "entropy" \
    --kl_ctl 0 \
    --ent_ctl 0.1 \
    --alpha_ctl 0.1 \
 ```
 
-Here, kl_ctl and ent_ctl are the beta in the paper, alpha_ctl is the alpha in the paper.
+Here, kl_ctl and ent_ctl are the beta in the paper, alpha_ctl is the alpha in the paper. By letting ent_ctl = 0.1, 0.5, 1.0 and alpha_ctl = 0.1, 0.3, 0.5, we can obtain the results Figure 1 and Table 1 of the paper.
 
 ## Reproducing the Experiments of Preferences in Summarization
 
 Replace train_llama2_7b.sh by train_llama2_7b_tldr.sh, train_llama3_1b_tldr.sh, and train_llama3_3b_tldr.sh in the above shell script.
 
-## Reproducing Figure 6 and Table 3 Results
+## Reproducing the Experiments on the OPT model
 
 Replace train_llama2_7b.sh by train_opt1.3b.sh in the above shell script.
 
