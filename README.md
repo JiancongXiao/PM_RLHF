@@ -16,7 +16,7 @@ To reproduce the experiments reported in Table 2 of the paper, run the following
 
 ```bash
 bash training_scripts/sft/train_llama3_1b_tldr.sh
-```bash
+‘’‘
 
 
 ## Main Result
