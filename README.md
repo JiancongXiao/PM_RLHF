@@ -23,14 +23,51 @@ Accurately aligning large language models (LLMs) with human preferences is cruci
 - `numpy` ≥ 1.24.0  
 
 
-## Reproducing Table 2 Results
+## Reproducing Figure 1 and Table 1 Results
 
-To reproduce the experiments reported in Table 2 of the paper, run the following shell script:
+To reproduce the experiments reported in Figure 1 and Table 1 of the paper, run the following shell script:
+
+Step 1: SFT
 
 ```bash
-bash training_scripts/sft/train_llama3_1b_tldr.sh
+training_scripts/sft/train_llama2_7b.sh
 ```
 
+Step 2: Reward Modeling
+
+```bash
+bash training_scripts/rm/train_llama2_7b.sh
+```
+
+Step 3: (Standard) RLHF Finetuning
+
+```bash
+bash training_scripts/po/ppo/train_llama2_7b.sh
+   --penalty "kl" \
+   --kl_ctl 0.1 \
+   --ent_ctl 0 \
+   --alpha_ctl 0 \
+```
+
+For the experiments of PM RLHF, replace the parameters in Step 3 as follows:
+
+```bash
+bash training_scripts/po/ppo/train_llama2_7b.sh
+   --penalty "entropy" \
+   --kl_ctl 0 \
+   --ent_ctl 0.1 \
+   --alpha_ctl 0.1 \
+```
+
+Here, kl_ctl and ent_ctl are the beta in the paper, alpha_ctl is the alpha in the paper.
+
+## Reproducing Table 2 Results
+
+Replace train_llama2_7b.sh by train_llama2_7b_tldr.sh, train_llama3_1b_tldr.sh, and train_llama3_3b_tldr.sh in the above shell script.
+
+## Reproducing Figure 6 and Table 3 Results
+
+Replace train_llama2_7b.sh by train_opt.sh in the above shell script.
 
 ## Main Result
 1. Standard RLHF is biased. Its algorithmic bias inherits from the reference model.
