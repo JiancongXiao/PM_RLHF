@@ -15,11 +15,11 @@ Accurately aligning large language models (LLMs) with human preferences is cruci
 - `python` ≥ 3.10  
 - `torch` (PyTorch) ≥ 2.0  
 - `transformers` ≥ 4.29.0  
-- `deepspeed-chat` ≥ 0.9.0 (for RLHF stages and data pipeline integration)  
-- `datasets` ≥ 2.10.0 (used for TLDR dataset loading)  
-- `accelerate` ≥ 0.18.0 (for distributed training support)  
-- `wandb` ≥ 0.15.0 (optional for logging)  
-- `scipy` ≥ 1.10.0  (used in PM regularization components)  
+- `deepspeed-chat` ≥ 0.9.0
+- `datasets` ≥ 2.10.0
+- `accelerate` ≥ 0.18.0
+- `wandb` ≥ 0.15.0 
+- `scipy` ≥ 1.10.0  
 - `numpy` ≥ 1.24.0  
 
 
