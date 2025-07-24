@@ -67,7 +67,7 @@ Replace train_llama2_7b.sh by train_llama2_7b_tldr.sh, train_llama3_1b_tldr.sh, 
 
 ## Reproducing Figure 6 and Table 3 Results
 
-Replace train_llama2_7b.sh by train_opt.sh in the above shell script.
+Replace train_llama2_7b.sh by train_opt1.3b.sh in the above shell script.
 
 ## Main Result
 1. Standard RLHF is biased. Its algorithmic bias inherits from the reference model.
