@@ -12,6 +12,7 @@ Accurately aligning large language models (LLMs) with human preferences is cruci
 
 ## Required Packages & Versions
 
+- `cuda` ≥ 12.1
 - `python` ≥ 3.10  
 - `torch` (PyTorch) ≥ 2.0  
 - `transformers` ≥ 4.29.0  
