@@ -23,7 +23,7 @@ Accurately aligning large language models (LLMs) with human preferences is cruci
 - `numpy` ≥ 1.24.0  
 
 
-## Reproducing Figure 1 and Table 1 Results
+## Reproducing the Experiments of Preferences in Helpfulness and Harmlessness
 
 To reproduce the experiments reported in Figure 1 and Table 1 of the paper, run the following shell script:
 
@@ -61,7 +61,7 @@ bash training_scripts/po/ppo/train_llama2_7b.sh
 
 Here, kl_ctl and ent_ctl are the beta in the paper, alpha_ctl is the alpha in the paper.
 
-## Reproducing Table 2 Results
+## Reproducing the Experiments of Preferences in Summarization
 
 Replace train_llama2_7b.sh by train_llama2_7b_tldr.sh, train_llama3_1b_tldr.sh, and train_llama3_3b_tldr.sh in the above shell script.
 
