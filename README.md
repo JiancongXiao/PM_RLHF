@@ -26,7 +26,7 @@ Accurately aligning large language models (LLMs) with human preferences is cruci
 
 ## Reproducing the Experiments of Preferences in Helpfulness and Harmlessness
 
-To reproduce the experiments reported in Figure 1 and Table 1 of the paper, run the following shell script:
+To reproduce the experiments reported in Figure 1 and Table 1 of the paper, run the following shell scripts:
 
 Step 1: SFT:
 
@@ -66,11 +66,11 @@ For the experiments of PM RLHF, set the parameters
    --alpha_ctl 0.1 \
 ```
 
-Here, kl_ctl and ent_ctl are the beta in the paper, alpha_ctl is the alpha in the paper. By letting ent_ctl = 0.1, 0.5, 1.0 and alpha_ctl = 0.1, 0.3, 0.5, we can obtain the results Figure 1 and Table 1 of the paper.
+Here, kl_ctl and ent_ctl are the beta in the paper, alpha_ctl is the alpha in the paper. By letting ent_ctl = 0.1, 0.5, 1.0 and alpha_ctl = 0.1, 0.3, 0.5, we can obtain the results shown in Figure 1 and Table 1 of the paper.
 
 ## Reproducing the Experiments of Preferences in Summarization
 
-Replace train_llama2_7b.sh by train_llama2_7b_tldr.sh, train_llama3_1b_tldr.sh, and train_llama3_3b_tldr.sh in the above shell script.
+Replace train_llama2_7b.sh by train_llama2_7b_tldr.sh, train_llama3_1b_tldr.sh, and train_llama3_3b_tldr.sh in the above shell scripts. We can obtain the results shown in Table 2 of the paper.
 
 ## Reproducing the Experiments on the OPT model
 
