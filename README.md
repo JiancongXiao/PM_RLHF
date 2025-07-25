@@ -95,6 +95,13 @@ The following table provides the estimated time to run one epoch on the TLDR dat
 | LLaMA 3‑1B  | 2 min  | 5 min  | 8 min  |
 | LLaMA 3‑3B  | 5 min  | 15 min | 25 min |
 
+The following table provides the estimated time to run one epoch on the HH dataset using 4 A100 GPUs:
+
+| Model       | Step 1 | Step 2 | Step 3 |
+|-------------|--------|--------|--------|
+| OPT-1.3B  | 8 min | 26 min | 37 min |
+| LLaMA 2‑7B  | 31 min | 102 min | 151 min |
+
 
 ## Main Result
 1. Standard RLHF is biased. Its algorithmic bias inherits from the reference model.
