@@ -85,6 +85,17 @@ training_scripts/Output_probs.ipynb
 ```
 to obtain the results shown in Figure 2 and 4.
 
+## Training Time
+
+The following table provides the estimated time to run one epoch on the TLDR dataset using 4 A100 GPUs:
+
+| Model       | Step 1 | Step 2 | Step 3 |
+|-------------|--------|--------|--------|
+| LLaMA 2‑7B  | 12 min | 36 min | 59 min |
+| LLaMA 3‑1B  | 2 min  | 5 min  | 8 min  |
+| LLaMA 3‑3B  | 5 min  | 15 min | 25 min |
+
+
 ## Main Result
 1. Standard RLHF is biased. Its algorithmic bias inherits from the reference model.
 
